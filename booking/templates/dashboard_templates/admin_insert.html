@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'CSS/dashboard/admin_insert.css' %}">
+    <title>Form Template</title>
+    
+</head>
+<body>
+    <form method="post">{% csrf_token %}
+        <h2>Form Details</h2>
+        <label for="title">Title:</label>
+        <input type="text" name="title" required>
+
+        <label for="url">URL:</label>
+        <input type="url" name="url" required>
+
+        <label for="icon">Icon:</label>
+        <input type="text" name="icon">
+
+        <label for="subdivision">subdivision:</label>
+       <input type="text" name="subdivision" required>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+
+

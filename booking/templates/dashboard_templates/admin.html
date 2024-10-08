@@ -1,0 +1,572 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!----======== CSS ======== -->
+
+    
+
+    
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS, Popper.js, and jQuery (required for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+
+     
+    <!----===== Iconscout CSS ===== -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'CSS/dashboard/admin.css' %}">
+    <title>Admin Dashboard Panel</title> 
+    
+    
+    
+    <script>
+        if (performance.navigation.type === 2) {
+            alert("You cannot access the dashboard after logging out. Please log in again.");
+            window.location.href = "{% url 'login' %}";
+        }
+    </script>
+    
+     
+</head>
+<body>
+
+    <nav>
+
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=220" alt="">
+            </div>&nbsp;&nbsp;&nbsp;&nbsp;
+            
+            <!-- <span class="link-name-user" style="font-size: x-large;color: var(--black-light-color);font-style: italic;">{{ user.username }}</span> -->
+
+        </div>
+
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li> <div class="mode">
+                    <a href="/dashboard" class="dropbtn">
+                    <i class="uil uil-estate"></i>
+                    <span class="link-name">Dashboard</span>
+                    </a></div>
+                </li>
+
+
+                <div class="sidebar" style="margin-left: -21px;">
+                    <ul>
+                        {% for sub in nav_item %}
+                        <li class="nav-item parent">
+                            <a href="#" style="font-size: 17px;color: var(--black-light-color)">
+                                <i class="{{ sub.icon }}"></i> <!-- Icon here -->
+                                {{ sub.title }}
+                            </a>
+                            <ul>
+                                {% for i in Sidebar %}
+                                {% if sub.title == i.subdivision %}
+                                <li class="nav-item">
+                                    <a href="{{ i.url }}">{{ i.title }}</a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+            </ul>
+
+                <script>
+                    document.querySelectorAll('.sidebar .parent > a').forEach(function(parentLink) {
+                        parentLink.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            let parentLi = this.parentNode;
+                            parentLi.classList.toggle('active');
+                            
+                            
+                            document.querySelectorAll('.sidebar .parent').forEach(function(otherLi) {
+                                if (otherLi !== parentLi) {
+                                    otherLi.classList.remove('active');
+                                }
+                            });
+                        });
+                    });
+                </script> 
+            
+            <ul class="logout-mode">
+                <li><a href="/login">
+                    <i class="uil uil-signout" style="padding-bottom: 35px;"></i>
+                    <span class="link-name" style="padding-bottom: 32px;">Logout</span>
+                </a></li>
+
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                    <span class="link-name">Dark Mode</span>
+                </a>
+
+                <div class="mode-toggle">
+                  <span class="switch"></span>
+                </div>
+            </li>
+            </ul>
+        </div>
+    </nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const flightsDropdown = document.getElementById("flightsDropdown");
+    const busesDropdown = document.getElementById("busesDropdown");
+    const cabsDropdown = document.getElementById("cabsDropdown");
+    const hotelsDropdown = document.getElementById("hotelsDropdown");
+
+    // Toggle visibility function
+    function toggleVisibility(dropdown) {
+        const dropdownContent = dropdown.querySelector(".dropdown-content");
+        dropdownContent.style.display = dropdownContent.style.display === "none" ? "block" : "none";
+    }
+
+    // Hide dropdown content by default
+    [flightsDropdown, busesDropdown, cabsDropdown, hotelsDropdown].forEach(dropdown => {
+        const dropdownContent = dropdown.querySelector(".dropdown-content");
+        dropdownContent.style.display = "none";
+    });
+
+    // Event listeners for dropdowns
+    flightsDropdown.addEventListener("click", function(event) {
+        event.stopPropagation();
+        toggleVisibility(flightsDropdown);
+    });
+
+    busesDropdown.addEventListener("click", function(event) {
+        event.stopPropagation();
+        toggleVisibility(busesDropdown);
+    });
+
+    cabsDropdown.addEventListener("click", function(event) {
+        event.stopPropagation();
+        toggleVisibility(cabsDropdown);
+    });
+
+    hotelsDropdown.addEventListener("click", function(event) {
+        event.stopPropagation();
+        toggleVisibility(hotelsDropdown);
+    });
+
+    // Close dropdown content when clicking outside the dropdown
+    document.addEventListener("click", function(event) {
+        [flightsDropdown, busesDropdown, cabsDropdown, hotelsDropdown].forEach(dropdown => {
+            const dropdownContent = dropdown.querySelector(".dropdown-content");
+            if (!dropdown.contains(event.target)) {
+                dropdownContent.style.display = "none";
+            }
+        });
+    });
+});
+
+</script>
+
+
+
+<div class="dashboard">
+    <div class="top">
+        <i class="uil uil-bars sidebar-toggle"></i>
+
+        <div class="search-box">
+            <i class="uil uil-search"></i>
+            <input type="text" placeholder="Search here...">
+        </div>
+        
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{{profile.image.url}}" alt="Profile Pic" class="profile-picture" id="profile-picture"></i>&nbsp;{{user.username}}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" id="profile-btn" href="#"><i class="bi bi-gear"></i> My Profile</a></li>
+                <li><a class="dropdown-item" id="resetpassword" href="#"><i class="bi bi-envelope"></i> Reset Password</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" id="logout" href="javascript:void(0);" onclick="confirmLogout()"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+        
+    </div>
+    {% block main_content %}
+    <div class="dash-content">
+        <div class="overview">
+            <div class="title">
+                <i class="uil uil-tachometer-fast-alt"></i>
+                <span class="text">Dashboard</span>
+            </div>
+
+            <div class="boxes">
+                <div class="box box1">
+                    <i class="bi bi-airplane-fill"></i>
+                    <span class="text">Flights</span>
+                </div>
+                <div class="box box2">
+                    <i class="bi bi-bus-front-fill"></i>
+                    <span class="text">Buses</span>
+                </div>
+                <div class="box box3">
+                    <i class="bi bi-taxi-front-fill"></i>
+                    <span class="text">Cabs</span>
+                </div>
+                <div class="box box4">
+                    <i class="bi bi-buildings-fill"></i>
+                    <span class="text">Hotels</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock main_content %}
+    <br>
+</div>
+
+
+
+ <!-- Overlay -->
+ <div class="custom-overlay" id="custom-overlay" style="display: none;"></div>
+
+ <!-- Update Profile Modal -->
+ <div class="custom-modal" id="updateProfileModal" style="display: none;">
+     <div class="custom-dialog custom-lg-dailog">
+         <div class="custom-content">
+            <div class="modal-container"><br><br>
+
+                <div class="d-flex align-items-start">
+                    <div class="nav flex-column nav-pills me-3" id="custom-tab" role="tablist" aria-orientation="vertical">
+                        <button class="nav-link active" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="true">My Profile</button>
+                        <button class="nav-link" id="password-tab" data-bs-toggle="pill" data-bs-target="#v-pills-password" type="button" role="tab" aria-controls="v-pills-password" aria-selected="false">Reset password</button>
+                        <button class="nav-link" id="v-pills-logout-tab" data-bs-toggle="pill" data-bs-target="#v-pills-logout" type="button" role="tab" aria-controls="v-pills-logout" aria-selected="false">Logout</button>
+                    </div>
+            
+                    <div class="tab-content" id="custom-tabContent">
+                        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                            <div class="profile-container" id="profile-container" >
+                                <img src="{{profile.image.url}}" alt="Profile Picture" class="profile-picture" id="profile-picture" style="width: 125px; height: 125px;"><br><br>
+            
+                                <h5 class="profile-name">Name: {{ profile.user.username }} </h5>
+                                <p class="profile-email">Email: {{ profile.email }} </p>
+                                <p class="profile-mobile">Mob no: {{ profile.mobile_number }} </p><br>
+                                <button class="btn btn-primary" id="update-profile-btn" type="button">Update Profile</button>
+                            </div>
+                        </div>
+            
+                            <div class="tab-pane fade" id="v-pills-password" role="tabpanel" aria-labelledby="v-pills-password-tab">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Reset Password</h4>
+                                        <form name="reset_password" id="updatepasswordForm" method="post" enctype="multipart/form-data"> {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="current-password" class="form-label">Current Password</label>
+                                                <input type="password" class="form-control" id="current-password" name="current_password" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="new-password" class="form-label">New Password</label>
+                                                <input type="password" class="form-control" id="new-password" name="new_password" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="confirm-password" class="form-label">Confirm New Password</label>
+                                                <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Reset Password</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <div class="tab-pane fade" id="v-pills-Manage" role="tabpanel" aria-labelledby="v-pills-Manage-tab">
+
+                        </div>
+                        <div class="tab-pane fade" id="v-pills-logout" role="tabpanel" aria-labelledby="v-pills-logout-tab">
+                            <a class="dropdown-item" id="logout" href="javascript:void(0);" onclick="confirmLogout()"><i class="bi bi-box-arrow-right"></i> Click here to logout</a>
+
+                        </div>
+                    </div>
+                </div><br><br>
+            </div>
+         </div>
+     </div>
+ </div>
+<!-- Bootstrap JS, Popper.js, and jQuery (required for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script>
+    function confirmLogout() {
+        // Show a confirmation dialog
+        if (confirm("Are you sure you want to logout?")) {
+            // If confirmed, redirect to the logout URL
+            window.location.href = "/login";
+        }
+        // If canceled, do nothing
+    }
+</script>
+
+    <!-- <script src="script.js"></script> -->
+    <script>
+        const body = document.querySelector("body"),
+      modeToggle = body.querySelector(".mode-toggle");
+      sidebar = body.querySelector("nav");
+      sidebarToggle = body.querySelector(".sidebar-toggle");
+
+let getMode = localStorage.getItem("mode");
+if(getMode && getMode ==="dark"){
+    body.classList.toggle("dark");
+}
+
+let getStatus = localStorage.getItem("status");
+if(getStatus && getStatus ==="close"){
+    sidebar.classList.toggle("close");
+}
+
+modeToggle.addEventListener("click", () =>{
+    body.classList.toggle("dark");
+    if(body.classList.contains("dark")){
+        localStorage.setItem("mode", "dark");
+    }else{
+        localStorage.setItem("mode", "light");
+    }
+});
+
+sidebarToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("close");
+    if(sidebar.classList.contains("close")){
+        localStorage.setItem("status", "close");
+    }else{
+        localStorage.setItem("status", "open");
+    }
+})
+    </script>
+
+<script>
+    // Get the modal and overlay
+    var modal = document.getElementById('updateProfileModal');
+    var overlay = document.getElementById('custom-overlay');
+    
+    // Get the button that opens the modal
+    var btn = document.getElementById('profile-btn');
+    var pbtn = document.getElementById('resetpassword');
+    var lbtn = document.getElementById('logout');
+
+
+    var password_tab=document.getElementById('password-tab');
+    var profile_tab=document.getElementById('profile-tab');
+    var password_v=document.getElementById('v-pills-password');
+    var profile_v=document.getElementById('profile');
+    
+    var logout_tab=document.getElementById('v-pills-logout-tab');
+    var logout_v=document.getElementById('v-pills-logout');
+
+    var all_tabs=document.querySelectorAll('#password-tab','#profile-tab','#manage-tab');
+    var all_v=document.querySelectorAll('#profile','#v-pills-password','#v-pills-manage');
+    // Get the buttons that close the modal
+    var closeBtns = document.querySelectorAll('#close-modal-btn, #custom-overlay');
+    
+    // When the user clicks the button, open the modal and overlay
+    
+    btn.onclick = function() {
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+
+        profile_tab.classList.add('active');
+        profile_v.classList.add('active');
+        profile_v.classList.add('show');
+        profile_tab.ariaSelected='true';
+
+        password_tab.classList.remove('active');
+        password_v.classList.remove('active');
+        password_v.classList.remove('show');
+        password_tab.ariaSelected='false';
+
+
+        logout_tab.classList.remove('active');
+        logout_v.classList.remove('active');
+        logout_v.classList.remove('show');
+        logout_tab.ariaSelected='false';
+    }
+    pbtn.onclick=function(){
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+
+        profile_tab.classList.remove('active');
+        profile_v.classList.remove('active');
+        profile_v.classList.remove('show');
+        profile_tab.ariaSelected='false';
+
+        password_tab.classList.add('active');
+        password_v.classList.add('active');
+        password_v.classList.add('show');
+        password_tab.ariaSelected='true';
+
+
+        logout_tab.classList.remove('active');
+        logout_v.classList.remove('active');
+        logout_v.classList.remove('show');
+        logout_tab.ariaSelected='false';
+    }
+   
+    
+    // When the user clicks on any close button, close the modal and overlay
+    closeBtns.forEach(function(btn) {
+        btn.onclick = function() {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+    });
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == overlay) {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+    }
+</script>
+
+<script>
+    document.getElementById('update-profile-btn').addEventListener('click', function() {
+        const profileContainer = document.getElementById('profile-container');
+        profileContainer.innerHTML = `
+            <div class="card user-card-full" id="update-container" >
+                 <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                <div class="row m-l-0 m-r-0">
+                    <div class="col-sm-4 bg-c-lite-green user-profile">
+                        <div class="card-block text-center text-white">
+                            <div class="m-b-25">
+                                <img src="{{profile.image.url}}" alt="Previous Image" class="img-fluid rounded" id="previous-image" style="width: 125px; height:125px;">
+                                <input accept="image/*" style="display: none;" name="image" id="uploadImage" type="file" onchange="document.getElementById('previous-image').src = window.URL.createObjectURL(this.files[0])"><br><br>
+                                <div class="editPic" >
+                                    <label for="uploadImage" class="image-edit" style=" font-size: 25px; color: black; "><i class="uil uil-image-edit" "></i></label>
+                                </div>
+                            </div>
+                            <h3 class="f-w-600"> {{ profile.user.username }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="card-block">
+                            <h4 class="m-b-20 m-t-5 p-b-5 b-b-default f-w-600">Information</h4>
+                            <div class="col">
+                                <div class="col-sm-12">
+                                    <p class="mb-0 py-2 f-w-600">Email:</p>
+                                    <input type="email" name="email" id="email" value="{{ profile.email }}" class="form-control" required>
+                                </div>
+                                <div class="col-sm-12">
+                                    <p class="mb-0 py-2 f-w-600">Mobile Number:</p>
+                                    <input type="tel" name="mobile_number" id="mobile_number" pattern="[0-9]{10}" value="{{ profile.mobile_number }}" class="form-control" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid 10-digit phone number.
+                                    </div>
+                                </div>
+                            </div><br>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancel-update-btn">Cancel</button>
+                                <button class="btn btn-primary" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+        `;
+
+        // Initialize form validation
+        Array.from(document.querySelectorAll('form')).forEach((form) => {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+
+    document.addEventListener('click', function(event) {
+        if (event.target && event.target.id === 'cancel-update-btn') {
+            location.reload(); // Reload the page to return to the original profile view
+        }
+    });
+</script>
+<script>
+    document.querySelector('#v-pills-password').addEventListener('submit', function(event) {
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    if (newPassword !== confirmPassword) {
+        event.preventDefault();
+        alert('New passwords do not match.');
+    }
+});
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#updatepasswordForm').on('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the default way
+
+            var formData = new FormData();
+            var newpassword=document.getElementById('new-password').value;
+            var password=document.getElementById('current-password').value;
+            formData.append('newpassword',newpassword)
+            formData.append('password',password) // Create a FormData object from the form
+            
+            $.ajax({
+                url: '{% url "ajax_test" %}',  // Update the URL to your API endpoint
+                type: 'POST',
+                data: formData,
+                contentType: 'application/json',
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                
+                success: function(response) {
+                  console.log('Update successful:', response);
+                  
+                  if (response['message']=='updated successfully') {
+                    alert(response['message'])
+                    window.location.href = "/login";
+                  }
+                  else{
+                    alert(response['message'])
+                  }
+                },
+                error: function(xhr, status, error) {
+                  console.error('Update failed:', error);
+                  alert(error)
+                }
+              });
+        });
+    });
+
+   
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+
+</body>
+</html>
